@@ -19,3 +19,8 @@ resource "azurerm_resource_group" "rggg" {
   name     = "rg-bhakuaaaa"
   location = "east us"
 }
+
+resource "azurerm_resource_group" "rggg1" {
+  name     = "rg-bhakuaaaa1"
+  location = "east us"
+}
