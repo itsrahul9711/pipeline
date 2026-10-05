@@ -4,8 +4,21 @@ trigger:
 
 pool: infra_dondu
 
+parameters:
+  - name: tfsec
+    displayName: tfsec krna hai?
+    type: boolean
+    default: false
+
+  - name: tflint
+    displayName: tflint krna hai?
+    type: boolean
+    default: false
+
 stages:
   - stage: tfsec
+    dependsOn: []
+    condition: ${{ parameters.tfsec }}
     displayName: tfsec scan
     jobs:
       - job: tfsec
@@ -17,6 +30,8 @@ stages:
               script: 'tfsec'
 
   - stage: tflint
+    dependsOn: []
+    condition: ${{ parameters.tflint }}
     displayName: tflint scan
     jobs:
       - job: tflint
@@ -27,22 +42,10 @@ stages:
               targetType: 'inline'
               script: 'tflint --recursive --force'
 
-  - stage: infracost
-    displayName: infracost
-    jobs:
-      - job: infracost 
-        displayName: infracost
-        steps:
-          - task: InfracostSetup@2
-            inputs:
-              apiKey: 'ico-sqro8FlLxZss9ygbGP6Egl2USz9q8Y6Q'
-              version: '0.10.x'
-          - task: PowerShell@2
-            inputs:
-              targetType: 'inline'
-              script: 'infracost breakdown --path.'
-
   - stage: init
+    dependsOn:
+    - tfsec
+    - tflint
     displayName: init
     jobs:
       - job: init
@@ -59,6 +62,8 @@ stages:
               backendAzureRmKey: 'lab.tfstate'
 
   - stage: validate
+    dependsOn:
+    - init
     displayName: validate
     jobs:
       - job: validate
@@ -79,6 +84,8 @@ stages:
               command: 'validate'
 
   - stage: plan
+    dependsOn:
+    - validate
     displayName: plan
     jobs:
       - job: plan
@@ -100,6 +107,8 @@ stages:
               environmentServiceNameAzureRM: 'Dondu_Service_Connection'
 
   - stage: approval
+    dependsOn:
+    - plan
     displayName: approval
     jobs:
       - job: approval
@@ -111,6 +120,8 @@ stages:
               notifyUsers: 'abc'
           
   - stage: apply
+    dependsOn:
+    - approval
     displayName: apply
     jobs:
       - job: apply
