@@ -5,6 +5,43 @@ trigger:
 pool: infra_dondu
 
 stages:
+  - stage: tfsec
+    displayName: tfsec scan
+    jobs:
+      - job: tfsec
+        displayName: tfsec scan
+        steps:
+          - task: PowerShell@2
+            inputs:
+              targetType: 'inline'
+              script: 'tfsec'
+
+  - stage: tflint
+    displayName: tflint scan
+    jobs:
+      - job: tflint
+        displayName: tflint scan
+        steps:
+          - task: PowerShell@2
+            inputs:
+              targetType: 'inline'
+              script: 'tflint --recursive --force'
+
+  - stage: infracost
+    displayName: infracost
+    jobs:
+      - job: infracost 
+        displayName: infracost
+        steps:
+          - task: InfracostSetup@2
+            inputs:
+              apiKey: 'ico-sqro8FlLxZss9ygbGP6Egl2USz9q8Y6Q'
+              version: '0.10.x'
+          - task: PowerShell@2
+            inputs:
+              targetType: 'inline'
+              script: 'infracost breakdown --path'
+
   - stage: init
     displayName: init
     jobs:
