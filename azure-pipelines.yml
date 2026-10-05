@@ -1,0 +1,96 @@
+trigger:
+- main
+- feature\*
+
+pool: infra_dondu
+
+stages:
+  - stage: init
+    displayName: init
+    jobs:
+      - job: init
+        displayName: init
+        steps:
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendAzureRmUseEntraIdForAuthentication: false
+              backendServiceArm: 'Dondu_Service_Connection'
+              backendAzureRmStorageAccountName: 'dondu'
+              backendAzureRmContainerName: 'dondustorage'
+              backendAzureRmKey: 'lab.tfstate'
+
+  - stage: validate
+    displayName: validate
+    jobs:
+      - job: validate
+        displayName: validate
+        steps:
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendAzureRmUseEntraIdForAuthentication: false
+              backendServiceArm: 'Dondu_Service_Connection'
+              backendAzureRmStorageAccountName: 'dondu'
+              backendAzureRmContainerName: 'dondustorage'
+              backendAzureRmKey: 'lab.tfstate'
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+
+  - stage: plan
+    displayName: plan
+    jobs:
+      - job: plan
+        displayName: plan
+        steps:
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendAzureRmUseEntraIdForAuthentication: false
+              backendServiceArm: 'Dondu_Service_Connection'
+              backendAzureRmStorageAccountName: 'dondu'
+              backendAzureRmContainerName: 'dondustorage'
+              backendAzureRmKey: 'lab.tfstate'
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              environmentServiceNameAzureRM: 'Dondu_Service_Connection'
+
+  - stage: approval
+    displayName: approval
+    jobs:
+      - job: approval
+        displayName: approval
+        pool: server
+        steps:
+          - task: ManualValidation@1
+            inputs:
+              notifyUsers: 'abc'
+          
+  - stage: apply
+    displayName: apply
+    jobs:
+      - job: apply
+        displayName: apply
+        steps:
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendAzureRmUseEntraIdForAuthentication: false
+              backendServiceArm: 'Dondu_Service_Connection'
+              backendAzureRmStorageAccountName: 'dondu'
+              backendAzureRmContainerName: 'dondustorage'
+              backendAzureRmKey: 'lab.tfstate'
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              environmentServiceNameAzureRM: 'Dondu_Service_Connection'
+          
