@@ -4,8 +4,22 @@ trigger:
 
 pool: infra_dondu
 
+parameters:
+  - name: tfsec
+    displayName: tfsec chalana hai kya?
+    type: boolean
+    default: false
+
+  - name: tflint
+    displayName: tflint chalana hai kya?
+    type: boolean
+    default: false
+
+
+
 stages:
   - stage: tfsec
+    condition: ${{ parameters.tfsec }}
     displayName: tfsec Scan
     jobs:
       - job: tfsec
@@ -17,6 +31,7 @@ stages:
               script: 'tfsec'
 
   - stage: tflint
+    condition: ${{ parameters.tfsec }}
     displayName: tflint Scan
     jobs:
       - job: tflint
