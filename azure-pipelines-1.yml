@@ -92,7 +92,9 @@ stages:
 
   - stage: approval
     dependsOn:
+    - init
     - plan
+
     condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
     displayName: approval
     jobs:
