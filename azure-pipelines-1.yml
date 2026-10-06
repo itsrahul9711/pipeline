@@ -31,7 +31,7 @@ stages:
               script: 'tfsec'
 
   - stage: tflint
-    condition: ${{ parameters.tfsec }}
+    condition: ${{ parameters.tflint }}
     displayName: tflint Scan
     jobs:
       - job: tflint
