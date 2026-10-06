@@ -19,6 +19,7 @@ parameters:
 
 stages:
   - stage: tfsec
+    dependsOn: []
     condition: ${{ parameters.tfsec }}
     displayName: tfsec Scan
     jobs:
@@ -31,6 +32,7 @@ stages:
               script: 'tfsec'
 
   - stage: tflint
+    dependsOn: []
     condition: ${{ parameters.tflint }}
     displayName: tflint Scan
     jobs:
@@ -43,6 +45,9 @@ stages:
               script: 'tflint --recursive --force'
 
   - stage: init
+    dependsOn:
+    - tfsec
+    - tflint
     displayName: init and validate
     jobs:
       - job: init
@@ -63,6 +68,8 @@ stages:
               command: 'validate'
 
   - stage: plan
+    dependsOn:
+    - init
     displayName: plan
     jobs:
       - job: plan
@@ -84,6 +91,8 @@ stages:
               environmentServiceNameAzureRM: 'Dondu_Service_Connection'
 
   - stage: approval
+    dependsOn:
+    - plan
     condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
     displayName: approval
     jobs:
